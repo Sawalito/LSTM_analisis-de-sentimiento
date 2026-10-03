@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+latex/*.aux
+latex/*.log
+latex/*.out
+latex/*.nav
+latex/*.snm
+latex/*.toc
+.env
