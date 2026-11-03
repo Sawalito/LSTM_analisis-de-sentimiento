@@ -1,0 +1,45 @@
+metadatos desde Supabase: 1440 clips
+características desde caché: /home/saulrojas/LSTM_analisis-de-sentimiento/data/cache/plano.npz
+características desde caché: /home/saulrojas/LSTM_analisis-de-sentimiento/data/cache/resumen.npz
+logreg_plano     acc 0.451 ± 0.030  f1 0.431  (19s)
+logreg_resumen   acc 0.511 ± 0.058  f1 0.487  (3s)
+svm_resumen      acc 0.516 ± 0.062  f1 0.500  (11s)
+svm_pca_plano    acc 0.484 ± 0.033  f1 0.473  (20s)
+  fold 1 cfg 0 val 0.371 (14 ép., 136s) {'lr': 0.001185648752141644, 'weight_decay': 0.0012508236940391448, 'width': (64, 64, 32, 32, 16), 'label_smoothing': 0.0, 'bs': 64, 'epochs': 15, 'patience': 8}
+  fold 1 cfg 1 val 0.371 (15 ép., 145s) {'lr': 0.0009939579897486075, 'weight_decay': 0.0001719663089359835, 'width': (64, 64, 32, 32, 16), 'label_smoothing': 0.1, 'bs': 64, 'epochs': 15, 'patience': 8}
+fold 1: cfg 0 → test acc 0.383
+  fold 2 cfg 0 val 0.438 (14 ép., 150s) {'lr': 0.001185648752141644, 'weight_decay': 0.0012508236940391448, 'width': (64, 64, 32, 32, 16), 'label_smoothing': 0.0, 'bs': 64, 'epochs': 15, 'patience': 8}
+  fold 2 cfg 1 val 0.421 (15 ép., 159s) {'lr': 0.0009939579897486075, 'weight_decay': 0.0001719663089359835, 'width': (64, 64, 32, 32, 16), 'label_smoothing': 0.1, 'bs': 64, 'epochs': 15, 'patience': 8}
+fold 2: cfg 0 → test acc 0.450
+  fold 3 cfg 0 val 0.425 (15 ép., 148s) {'lr': 0.001185648752141644, 'weight_decay': 0.0012508236940391448, 'width': (64, 64, 32, 32, 16), 'label_smoothing': 0.0, 'bs': 64, 'epochs': 15, 'patience': 8}
+  fold 3 cfg 1 val 0.429 (15 ép., 140s) {'lr': 0.0009939579897486075, 'weight_decay': 0.0001719663089359835, 'width': (64, 64, 32, 32, 16), 'label_smoothing': 0.1, 'bs': 64, 'epochs': 15, 'patience': 8}
+fold 3: cfg 1 → test acc 0.379
+  fold 4 cfg 0 val 0.463 (11 ép., 105s) {'lr': 0.001185648752141644, 'weight_decay': 0.0012508236940391448, 'width': (64, 64, 32, 32, 16), 'label_smoothing': 0.0, 'bs': 64, 'epochs': 15, 'patience': 8}
+  fold 4 cfg 1 val 0.450 (15 ép., 150s) {'lr': 0.0009939579897486075, 'weight_decay': 0.0001719663089359835, 'width': (64, 64, 32, 32, 16), 'label_smoothing': 0.1, 'bs': 64, 'epochs': 15, 'patience': 8}
+fold 4: cfg 0 → test acc 0.362
+  fold 5 cfg 0 val 0.417 (15 ép., 158s) {'lr': 0.001185648752141644, 'weight_decay': 0.0012508236940391448, 'width': (64, 64, 32, 32, 16), 'label_smoothing': 0.0, 'bs': 64, 'epochs': 15, 'patience': 8}
+  fold 5 cfg 1 val 0.425 (15 ép., 156s) {'lr': 0.0009939579897486075, 'weight_decay': 0.0001719663089359835, 'width': (64, 64, 32, 32, 16), 'label_smoothing': 0.1, 'bs': 64, 'epochs': 15, 'patience': 8}
+fold 5: cfg 1 → test acc 0.342
+  fold 6 cfg 0 val 0.500 (15 ép., 140s) {'lr': 0.001185648752141644, 'weight_decay': 0.0012508236940391448, 'width': (64, 64, 32, 32, 16), 'label_smoothing': 0.0, 'bs': 64, 'epochs': 15, 'patience': 8}
+  fold 6 cfg 1 val 0.487 (15 ép., 137s) {'lr': 0.0009939579897486075, 'weight_decay': 0.0001719663089359835, 'width': (64, 64, 32, 32, 16), 'label_smoothing': 0.1, 'bs': 64, 'epochs': 15, 'patience': 8}
+fold 6: cfg 0 → test acc 0.438
+
+accuracy por fold (actores de prueba nunca vistos):
+ modelo  cnn_tuned  logreg_plano  logreg_resumen  svm_pca_plano  svm_resumen
+fold                                                                       
+1           0.383         0.425           0.596          0.454        0.617
+2           0.450         0.483           0.554          0.504        0.562
+3           0.379         0.442           0.479          0.442        0.475
+4           0.362         0.475           0.438          0.521        0.475
+5           0.342         0.471           0.525          0.512        0.508
+6           0.438         0.408           0.475          0.471        0.458
+
+                 acc_media  acc_desv  f1_media  gana_a_logreg_plano
+modelo                                                            
+svm_resumen         0.516     0.062     0.500                    5
+logreg_resumen      0.511     0.058     0.487                    5
+svm_pca_plano       0.484     0.033     0.473                    5
+logreg_plano        0.451     0.030     0.431                    0
+cnn_tuned           0.392     0.043     0.377                    1
+
+modelo final svm_resumen: {'svc__C': 10, 'svc__gamma': 0.001} (CV por actor 0.524) → /home/saulrojas/LSTM_analisis-de-sentimiento/models/svm_resumen.joblib

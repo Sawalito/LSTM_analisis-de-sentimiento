@@ -88,3 +88,28 @@ se alterna entre ellos con *Menu → Main document*. Las cifras del texto vienen
 
 RAVDESS — Livingstone & Russo (2018), PLoS ONE 13(5): e0196391. CC BY-NC-SA 4.0 (uso no comercial).
 # LSTM_analisis-de-sentimiento
+
+## Búsqueda de hiperparámetros (validación cruzada anidada por actor)
+
+`scripts/tune_hyperparams.py` lee los datos de Supabase y evalúa con 6 folds de 4 actores consecutivos
+(1–4, …, 21–24). Los hiperparámetros se eligen solo con los actores de entrenamiento de cada fold.
+Estos folds pueden no coincidir con los de E2/E3, así que la comparación válida es contra `logreg_plano`.
+
+| Modelo | Accuracy (media ± desv.) | F1 macro |
+|---|---|---|
+| SVM-RBF sobre descriptores por clip (289) | 51.6 ± 6.2 % | 0.500 |
+| LogReg sobre descriptores por clip | 51.1 ± 5.8 % | 0.487 |
+| SVM sobre vector plano + PCA | 48.4 ± 3.3 % | 0.473 |
+| LogReg sobre vector plano (baseline) | 45.1 ± 3.0 % | 0.431 |
+| CNN 64-64-32-32-16, 2 configs, ≤15 épocas (~30 min CPU) | 39.2 ± 4.3 % | 0.377 |
+
+La CNN llega a 100 % en entrenamiento hacia la época 11 mientras la validación se queda en ~41 %:
+sobreajusta, así que más épocas no la mejoran.
+
+Modelos: `models/svm_resumen.joblib` (final, 1440 clips; descriptores con `ser_model.summary_features`)
+y `models/cnn_tuned_folds.pt` (mejor CNN de cada fold con su escalador). Detalle en `resultados_tuning/`.
+
+```bash
+.venv/bin/python scripts/tune_hyperparams.py                                   # modelos clásicos
+.venv/bin/python scripts/tune_hyperparams.py --cnn 2 --small --epochs 15 --budget-min 55   # + CNN
+```
