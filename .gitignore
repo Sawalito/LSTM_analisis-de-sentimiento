@@ -8,3 +8,4 @@ latex/*.nav
 latex/*.snm
 latex/*.toc
 .env
+data/cache/

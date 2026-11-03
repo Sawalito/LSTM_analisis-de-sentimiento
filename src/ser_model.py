@@ -57,6 +57,43 @@ def clip_variants(args):
     return out
 
 
+# --- descriptores por clip (para LogReg/SVM; ver scripts/tune_hyperparams.py)
+def _f0_autocorr(y, sr, frame=2048, hop=512, fmin=60, fmax=500):
+    """log-F0 de cuadros sonoros por autocorrelación (numpy puro; librosa.yin hace segfault
+    con numba en este entorno)."""
+    frames = np.lib.stride_tricks.sliding_window_view(y, frame)[::hop]
+    energy = (frames ** 2).mean(1)
+    frames = frames[energy > 0.01 * energy.max()] * np.hanning(frame)
+    if len(frames) == 0:
+        return np.zeros(1)
+    spec = np.fft.rfft(frames, 2 * frame)
+    ac = np.fft.irfft(np.abs(spec) ** 2)[:, :frame]
+    lo, hi = int(sr / fmax), int(sr / fmin)
+    lag = lo + ac[:, lo:hi].argmax(1)
+    voiced = ac[np.arange(len(ac)), lag] > 0.3 * ac[:, 0]
+    return np.log(sr / lag[voiced]) if voiced.any() else np.zeros(1)
+
+
+def summary_features(path):
+    warnings.filterwarnings("ignore")
+    y = load_clip(path)
+    S = np.abs(librosa.stft(y, n_fft=2048, hop_length=512))
+    mfcc = librosa.feature.mfcc(S=librosa.power_to_db(librosa.feature.melspectrogram(S=S**2, sr=SR)), n_mfcc=40)
+    d1 = librosa.feature.delta(mfcc)
+    d2 = librosa.feature.delta(mfcc, order=2)
+    rms = librosa.feature.rms(S=S, frame_length=2048)
+    zcr = librosa.feature.zero_crossing_rate(y, frame_length=2048, hop_length=512)
+    contrast = librosa.feature.spectral_contrast(S=S, sr=SR)
+    chroma = librosa.feature.chroma_stft(S=S**2, sr=SR)
+    cent = librosa.feature.spectral_centroid(S=S, sr=SR)
+    roll = librosa.feature.spectral_rolloff(S=S, sr=SR)
+    f0v = _f0_autocorr(y, SR)
+    parts = [mfcc, d1, d2, rms, zcr, contrast, chroma, cent, roll]
+    stats = [np.concatenate([m.mean(1), m.std(1)]) for m in parts]
+    stats.append(np.array([f0v.mean(), f0v.std(), np.percentile(f0v, 90) - np.percentile(f0v, 10)]))
+    return np.concatenate(stats).astype(np.float32)
+
+
 class ConvSER(nn.Module):
     """Equivalente en PyTorch de la red Conv1D de la referencia (Keras)."""
 
